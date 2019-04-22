@@ -19,7 +19,7 @@ const styles = {
 function MediaCard(props) {
   const { classes } = props;
   return (
-    <div>
+    <div  >
       <Card className={classes.card} >
         <CardActionArea>
           <CardMedia
