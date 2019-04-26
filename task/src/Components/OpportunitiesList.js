@@ -1,17 +1,19 @@
 import React, { Component } from "react";
-import {Modal} from "react-bootstrap"
-import {ModalHeader} from "react-bootstrap"
-import {ModalBody} from "react-bootstrap"
-import {ModalFooter} from "react-bootstrap"
-import {Button} from "react-bootstrap"
+// import { Modal } from "react-bootstrap";
+// import { ModalHeader } from "react-bootstrap";
+// import { ModalBody } from "react-bootstrap";
+// import { ModalFooter } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import MediaCard from "./MediaCard";
-import {FormGroup} from "react-bootstrap"
-import Axios from "axios";
+import Modal from "react-responsive-modal";
+import { FormGroup } from "react-bootstrap";
+import { Input } from "reactstrap";
+import axios from "axios";
 export default class OpportunitiesList extends Component {
-  state={
-    showModal:false
-  }
-    getSyle = () => {
+  state = {
+    showModal: false
+  };
+  getSyle = () => {
     return {
       width: " 300px",
       height: "400px",
@@ -23,85 +25,66 @@ export default class OpportunitiesList extends Component {
     };
   };
 
-  updateOpp= async (id,title,desc)=>{
-      await Axios.patch("http://gisapi-web-staging-1636833739.eu-west-1.elb.amazonaws.com/v2/opportunities/"+id+"?access_token=dd0df21c8af5d929dff19f74506c4a8153d7acd34306b9761fd4a57cfa1d483c",{
-          title:title, description:desc
-      })
-  }
+  updateOpp = async (id, title, desc) => {
+    let res;
+    try {
+      res = await axios.patch(
+        "http://gisapi-web-staging-1636833739.eu-west-1.elb.amazonaws.com/v2/opportunities/" +
+          id +
+          "?access_token=dd0df21c8af5d929dff19f74506c4a8153d7acd34306b9761fd4a57cfa1d483c",
+        {
+          title: title,
+          description: desc
+        }
+      );
+    } catch {
+      console.log(res);
+    }
+    this.setState({ showModal: false });
+  };
 
-//   showModalHandler= async()=>{
-//    await this.setState({showModal:true})
-//     console.log (this.state.showModal)
-//   }
+  showModalHandler = async () => {
+    await this.setState({ showModal: true });
+    console.log(this.state.showModal);
+  };
 
-//   hideModalHandler= ()=>{
-//     this.setState({showModal:false})
-//   }
+  hideModalHandler = () => {
+    this.setState({ showModal: false });
+  };
   render() {
-   if (this.state.showModal)
-      return(
-      <div class="modal-dialog">
-    
-       
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Modal Header</h4>
-          </div>
-          <div class="modal-body">
-            <p>Some text in the modal.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
+    let title;
+    let desc;
+    return this.props.opps.map(opp => (
+      <div>
+        <div style={this.getSyle()} onClick={() => this.showModalHandler()}>
+          <MediaCard key={opp.id} opp={opp} />
+          <p> {}</p>
+          <p> {}</p>
         </div>
-    
-      </div> );
-    return (this.props.opps.map(opp => (
-      <div  style={this.getSyle() } onClick={()=>this.setState({showModal:true})} data-toggle="modal" data-target="#myModal">
-        <MediaCard
-       
-          key={opp.id}
-          opp={opp}
-          
-        />
-        <p> {}</p>
-        <p> {}</p>
-        <div id="myModal" class="modal fade" role="dialog">
-</div>
-{/*       
-<Modal isOpen={this.state.showModal} toggle={()=>this.showModalHandler()}>
-        <ModalHeader toggle={this.showModalHandler.bind(this)}>Edit a new Request</ModalHeader>
-        <ModalBody>
-       
-        
+        <Modal
+          open={this.state.showModal}
+          onClose={() => {
+            this.hideModalHandler();
+          }}
+        >
           <FormGroup>
-            <Label for="accepted">accepted</Label>
-            <Input id="accepted" value={this.state.editRequestData.accepted} onChange={(e) => {
-              let { editRequestData } = this.state;
+            <p>Edit Opportunity</p>
+            <p>title</p>
+            <Input title onChange={e => (title = e.target.value)} />
+            <p>{}</p>
+            <p>Desc</p>
+            <Input description onChange={e => (desc = e.target.value)}>
+              {" "}
+            </Input>
+            <p>{}</p>
 
-              editRequestData.accepted = e.target.value;
-
-              this.setState({ editRequestData });
-            }} />
-             <Label for="feedback">feedback</Label>
-            <Input id="feedback" value={this.state.editRequestData.feedback} onChange={(e) => {
-              let { editRequestData } = this.state;
-
-              editRequestData.feedback = e.target.value;
-
-              this.setState({ editRequestData });
-            }} />
-            <h3>ay 7aga</h3>
+            <Button onClick={() => this.updateOpp(opp.id, title, desc)}>
+              {" "}
+              Edit{" "}
+            </Button>
           </FormGroup>
-
-        </ModalBody>
-        <ModalFooter>
-          <Button color="primary" >Update Request</Button>{' '}
-          <Button color="secondary" >Cancel</Button>
-        </ModalFooter>
-      </Modal> */}
+        </Modal>
       </div>
-    )));
+    ));
   }
 }
